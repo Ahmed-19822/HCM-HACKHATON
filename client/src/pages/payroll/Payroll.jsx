@@ -40,13 +40,13 @@ export default function Payroll() {
 
   const generateMutation = useMutation({
     mutationFn: generatePayrollApi,
-    onSuccess: ()=>{ toast.success("Payroll generated"); qc.invalidateQueries(["payrolls"]); setModal(false); },
+    onSuccess: ()=>{ toast.success("Payroll generated"); qc.invalidateQueries({ queryKey: ["payrolls"] }); setModal(false); },
     onError: (e)=> toast.error(e.response?.data?.message || "Failed"),
   });
 
   const paidMutation = useMutation({
     mutationFn: markPaidApi,
-    onSuccess: ()=>{ toast.success("Marked as paid"); qc.invalidateQueries(["payrolls"]); },
+    onSuccess: ()=>{ toast.success("Marked as paid"); qc.invalidateQueries({ queryKey: ["payrolls"] }); },
     onError: ()=> toast.error("Failed"),
   });
 
@@ -85,7 +85,7 @@ export default function Payroll() {
               </tr>
             </thead>
             <tbody>
-              {isLoading ? <SkeletonTable rows={5}/> :
+              {isLoading ? <SkeletonTable rows={5} cols={7}/> :
                payrolls.length===0 ? (
                 <tr><td colSpan={7}>
                   <EmptyState icon={<HiCurrencyDollar/>} title="No payroll records" description="Generate payroll for the selected month"/>

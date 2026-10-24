@@ -148,7 +148,7 @@ export default function Dashboard() {
                   <p className="text-sm font-semibold text-slate-700">
                     {emp.firstName} {emp.lastName}
                   </p>
-                  <p className="text-xs text-slate-400">{emp.designation} � {emp.department?.name}</p>
+                  <p className="text-xs text-slate-400">{emp.designation} — {emp.department?.name}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-slate-500">{formatDate(emp.createdAt)}</p>

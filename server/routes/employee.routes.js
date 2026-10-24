@@ -5,12 +5,13 @@ import {
 } from '../controllers/employee.controller.js';
 import { protect, authorize } from '../middleware/auth.middleware.js';
 import upload from '../middleware/upload.middleware.js';
+import { validateEmployee } from '../validator/employee.validator.js';
 
 const router = express.Router();
 
 router.route('/')
   .get(protect, getEmployees)
-  .post(protect, authorize('admin', 'hr'), upload.single('avatar'), createEmployee);
+  .post(protect, authorize('admin', 'hr'), upload.single('avatar'), validateEmployee, createEmployee);
 
 router.route('/:id')
   .get(protect, getEmployee)

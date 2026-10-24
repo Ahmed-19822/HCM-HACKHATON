@@ -27,7 +27,7 @@ export default function Departments() {
     mutationFn: (data) => editItem ? updateDepartmentApi(editItem._id, data) : createDepartmentApi(data),
     onSuccess: () => {
       toast.success(editItem ? "Department updated" : "Department created");
-      qc.invalidateQueries(["departments"]);
+      qc.invalidateQueries({ queryKey: ["departments"] });
       closeModal();
     },
     onError: (err) => toast.error(err.response?.data?.message || "Failed"),
@@ -35,7 +35,7 @@ export default function Departments() {
 
   const deleteMutation = useMutation({
     mutationFn: deleteDepartmentApi,
-    onSuccess: () => { toast.success("Department deleted"); qc.invalidateQueries(["departments"]); setConfirm(null); },
+    onSuccess: () => { toast.success("Department deleted"); qc.invalidateQueries({ queryKey: ["departments"] }); setConfirm(null); },
     onError: () => toast.error("Failed to delete"),
   });
 

@@ -8,8 +8,10 @@ import ApiResponse from '../utils/ApiResponse.js';
 export const getDashboardStats = async (req, res, next) => {
   try {
     const today = new Date();
-    const startOfDay = new Date(today); startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay   = new Date(today); endOfDay.setHours(23, 59, 59, 999);
+    const startOfDay = new Date(today);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(today);
+    endOfDay.setHours(23, 59, 59, 999);
 
     const [
       totalEmployees,
@@ -24,8 +26,8 @@ export const getDashboardStats = async (req, res, next) => {
       Employee.countDocuments({ status: 'active' }),
       Department.countDocuments({ isActive: true }),
       Attendance.countDocuments({
-        date: { '': startOfDay, '': endOfDay },
-        status: { '': ['present', 'late'] },
+        date: { $gte: startOfDay, $lte: endOfDay },
+        status: { $in: ['present', 'late'] },
       }),
       Leave.countDocuments({ status: 'pending' }),
       Employee.find({ status: 'active' })
@@ -34,11 +36,18 @@ export const getDashboardStats = async (req, res, next) => {
         .select('firstName lastName designation createdAt')
         .populate('department', 'name'),
       Employee.aggregate([
-        { '': { status: 'active' } },
-        { '': { _id: '', count: { '': 1 } } },
-        { '': { from: 'departments', localField: '_id', foreignField: '_id', as: 'dept' } },
-        { '': '' },
-        { '': { name: '.name', count: 1, _id: 0 } },
+        { $match: { status: 'active' } },
+        { $group: { _id: '$department', count: { $sum: 1 } } },
+        {
+          $lookup: {
+            from: 'departments',
+            localField: '_id',
+            foreignField: '_id',
+            as: 'dept',
+          },
+        },
+        { $unwind: { path: '$dept', preserveNullAndEmptyArrays: true } },
+        { $project: { name: { $ifNull: ['$dept.name', 'Unassigned'] }, count: 1, _id: 0 } },
       ]),
     ]);
 
@@ -47,10 +56,12 @@ export const getDashboardStats = async (req, res, next) => {
       activeEmployees,
       totalDepartments,
       presentToday,
-      absentToday: activeEmployees - presentToday,
+      absentToday: Math.max(activeEmployees - presentToday, 0),
       pendingLeaves,
       recentHires,
       departmentBreakdown,
     }));
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 };

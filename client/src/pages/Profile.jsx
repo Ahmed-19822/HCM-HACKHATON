@@ -40,7 +40,7 @@ export default function Profile() {
       { icon: HiUser, label:"Employee ID", value: emp.employeeId },
       { icon: HiOfficeBuilding, label:"Department", value: emp.department?.name },
       { icon: HiUser, label:"Designation", value: emp.designation },
-      { icon: HiPhone, label:"Phone", value: emp.phone || "�" },
+      { icon: HiPhone, label:"Phone", value: emp.phone || "—" },
       { icon: HiCalendar, label:"Joined", value: formatDate(emp.dateOfJoining) },
       { icon: HiUser, label:"Status", value: <Badge status={emp.status}/> },
     ] : []),
@@ -78,7 +78,7 @@ export default function Profile() {
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-medium">{item.label}</p>
-                <p className="text-sm font-semibold text-slate-700">{item.value || "�"}</p>
+                <p className="text-sm font-semibold text-slate-700">{item.value || "—"}</p>
               </div>
             </motion.div>
           ))}

@@ -32,11 +32,11 @@ const payrollSchema = new mongoose.Schema(
 payrollSchema.index({ employee: 1, month: 1, year: 1 }, { unique: true });
 
 // Auto-calculate net salary
-payrollSchema.pre('save', function (next) {
-  const perDayRate = this.basicSalary / this.workingDays;
-  const earned     = perDayRate * this.presentDays;
-  this.netSalary   = earned + this.bonuses - this.deductions;
-  next();
+payrollSchema.pre('save', function () {
+  const days = this.workingDays || 1;
+  const perDayRate = this.basicSalary / days;
+  const earned = perDayRate * this.presentDays;
+  this.netSalary = Math.round((earned + this.bonuses - this.deductions) * 100) / 100;
 });
 
 const Payroll = mongoose.model('Payroll', payrollSchema);

@@ -19,7 +19,7 @@ const navItems = [
   { label: "Profile",     icon: HiUser,            path: "/profile",     roles: ["admin","hr","employee"] },
 ];
 
-export default function Sidebar({ collapsed, setCollapsed }) {
+export default function Sidebar({ collapsed, setCollapsed, mobileOpen = false, onNavigate }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -29,9 +29,10 @@ export default function Sidebar({ collapsed, setCollapsed }) {
 
   return (
     <motion.aside
-      animate={{ width: collapsed ? 72 : 240 }}
+      animate={{ width: collapsed && !mobileOpen ? 72 : 240 }}
       transition={{ type: "spring", damping: 25, stiffness: 200 }}
-      className="fixed left-0 top-0 h-screen bg-slate-900 text-white flex flex-col z-40 overflow-hidden border-r border-slate-800"
+      className={`fixed left-0 top-0 h-screen bg-slate-900 text-white flex flex-col z-40 overflow-hidden border-r border-slate-800
+        ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"} transition-transform duration-300`}
     >
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 py-5 border-b border-slate-800 min-h-[68px]">
@@ -57,7 +58,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       {/* Nav Items */}
       <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
         {filteredNav.map((item) => (
-          <NavLink key={item.path} to={item.path}
+          <NavLink key={item.path} to={item.path} onClick={onNavigate}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group
               ${isActive

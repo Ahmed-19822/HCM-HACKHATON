@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { checkInApi, checkOutApi, getAttendanceApi, getTodaySummaryApi } from "../../api/attendance.api";
-import { getEmployeesApi } from "../../api/employees.api";
 import { useAuth } from "../../context/AuthContext";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
@@ -33,13 +32,21 @@ export default function Attendance() {
 
   const checkInMutation = useMutation({
     mutationFn: checkInApi,
-    onSuccess: () => { toast.success("Checked in successfully!"); qc.invalidateQueries(["attendance-log"]); },
+    onSuccess: () => {
+      toast.success("Checked in successfully!");
+      qc.invalidateQueries({ queryKey: ["attendance-log"] });
+      qc.invalidateQueries({ queryKey: ["attendance-today"] });
+    },
     onError: (err) => toast.error(err.response?.data?.message || "Check-in failed"),
   });
 
   const checkOutMutation = useMutation({
     mutationFn: checkOutApi,
-    onSuccess: () => { toast.success("Checked out successfully!"); qc.invalidateQueries(["attendance-log"]); },
+    onSuccess: () => {
+      toast.success("Checked out successfully!");
+      qc.invalidateQueries({ queryKey: ["attendance-log"] });
+      qc.invalidateQueries({ queryKey: ["attendance-today"] });
+    },
     onError: (err) => toast.error(err.response?.data?.message || "Check-out failed"),
   });
 
@@ -93,7 +100,7 @@ export default function Attendance() {
               </tr>
             </thead>
             <tbody>
-              {isLoading ? <SkeletonTable rows={5}/> :
+              {isLoading ? <SkeletonTable rows={5} cols={6}/> :
                log.length === 0 ? (
                 <tr><td colSpan={6} className="py-12 text-center text-slate-400 text-sm">No attendance records for this date</td></tr>
                ) : log.map((r, i) => (
@@ -106,10 +113,10 @@ export default function Attendance() {
                     <span className="block text-xs text-slate-400">{r.employee?.employeeId}</span>
                   </td>
                   <td className="px-4 py-3 text-sm text-slate-600">{formatDate(r.date)}</td>
-                  <td className="px-4 py-3 text-sm text-slate-600">{r.checkIn ? new Date(r.checkIn).toLocaleTimeString() : "�"}</td>
-                  <td className="px-4 py-3 text-sm text-slate-600">{r.checkOut ? new Date(r.checkOut).toLocaleTimeString() : "�"}</td>
+                  <td className="px-4 py-3 text-sm text-slate-600">{r.checkIn ? new Date(r.checkIn).toLocaleTimeString() : "—"}</td>
+                  <td className="px-4 py-3 text-sm text-slate-600">{r.checkOut ? new Date(r.checkOut).toLocaleTimeString() : "—"}</td>
                   <td className="px-4 py-3"><Badge status={r.status}/></td>
-                  <td className="px-4 py-3 text-sm text-slate-500">{r.notes || "�"}</td>
+                  <td className="px-4 py-3 text-sm text-slate-500">{r.notes || "—"}</td>
                 </motion.tr>
               ))}
             </tbody>

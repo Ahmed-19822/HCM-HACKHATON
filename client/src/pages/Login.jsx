@@ -1,34 +1,35 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { loginApi } from "../api/auth.api";
 import { useAuth } from "../context/AuthContext";
-import Button from "../components/ui/Button";
-import Input from "../components/ui/Input";
+import { homePathForRole } from "../utils";
 import { HiSparkles, HiEye, HiEyeOff } from "react-icons/hi";
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, user, loading: authLoading } = useAuth();
   const navigate   = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPw, setShowPw] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitting(true);
     try {
       const res = await loginApi(form);
       login(res.data.data, res.data.data.token);
       toast.success(`Welcome back, ${res.data.data.name}!`);
-      navigate("/dashboard");
+      navigate(homePathForRole(res.data.data.role));
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
+
+  if (!authLoading && user) return <Navigate to={homePathForRole(user.role)} replace/>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950 flex items-center justify-center p-4 relative overflow-hidden">
@@ -82,7 +83,7 @@ export default function LoginPage() {
               <div className="relative">
                 <input
                   type={showPw ? "text" : "password"} required
-                  placeholder="��������"
+                  placeholder="••••••••"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   className="w-full px-4 py-3 pr-11 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all text-sm"
@@ -100,11 +101,11 @@ export default function LoginPage() {
                 whileTap={{ scale: 0.97 }}
                 whileHover={{ scale: 1.01 }}
                 type="submit"
-                disabled={loading}
+                disabled={submitting}
                 className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 text-white font-semibold shadow-lg shadow-indigo-500/40 hover:shadow-indigo-500/60 transition-all duration-300 disabled:opacity-60 flex items-center justify-center gap-2"
               >
-                {loading && <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>}
-                {loading ? "Signing in..." : "Sign In"}
+                {submitting && <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>}
+                {submitting ? "Signing in..." : "Sign In"}
               </motion.button>
             </motion.div>
           </form>

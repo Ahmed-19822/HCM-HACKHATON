@@ -65,20 +65,33 @@ app.use((req, res) => res.status(404).json({ success: false, message: 'Route not
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
+const isVercel = Boolean(process.env.VERCEL);
 
 const start = async () => {
   if (!process.env.JWT_SECRET) {
     console.error('JWT_SECRET is not set. Add it to server/.env before starting.');
     process.exit(1);
   }
+
   await connectDB();
   await seedAdmin();
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
-  });
+
+  if (!isVercel) {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
+    });
+  }
 };
 
-start().catch((err) => {
-  console.error(`Failed to start server: ${err.message}`);
-  process.exit(1);
-});
+if (!isVercel) {
+  start().catch((err) => {
+    console.error(`Failed to start server: ${err.message}`);
+    process.exit(1);
+  });
+} else {
+  start().catch((err) => {
+    console.error(`Failed to initialize serverless app: ${err.message}`);
+  });
+}
+
+export default app;

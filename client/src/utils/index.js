@@ -1,12 +1,12 @@
 export const formatDate = (date, opts = {}) => {
-  if (!date) return '�';
+  if (!date) return '—';
   return new Date(date).toLocaleDateString('en-PK', {
     year: 'numeric', month: 'short', day: 'numeric', ...opts,
   });
 };
 
 export const formatDateTime = (date) => {
-  if (!date) return '�';
+  if (!date) return '—';
   return new Date(date).toLocaleString('en-PK', {
     year: 'numeric', month: 'short', day: 'numeric',
     hour: '2-digit', minute: '2-digit',
@@ -14,17 +14,29 @@ export const formatDateTime = (date) => {
 };
 
 export const formatCurrency = (amount) => {
-  if (amount == null) return '�';
+  if (amount == null || Number.isNaN(Number(amount))) return '—';
   return new Intl.NumberFormat('en-PK', {
     style: 'currency', currency: 'PKR', maximumFractionDigits: 0,
   }).format(amount);
 };
 
 export const getInitials = (name = '') =>
-  name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+  name.split(' ').filter(Boolean).map((n) => n[0]).join('').toUpperCase().slice(0, 2) || '?';
 
 export const capitalize = (str = '') =>
-  str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
+
+export const avatarUrl = (src) => {
+  if (!src) return '';
+  if (src.startsWith('http') || src.startsWith('blob:') || src.startsWith('data:')) return src;
+  const base = (import.meta.env.VITE_STATIC_URL || '').replace(/\/$/, '');
+  const normalized = src.replace(/\\/g, '/');
+  const path = normalized.startsWith('/') ? normalized : `/${normalized}`;
+  return `${base}${path}`;
+};
+
+export const homePathForRole = (role) =>
+  ['admin', 'hr'].includes(role) ? '/dashboard' : '/attendance';
 
 export const statusColor = (status) => {
   const map = {

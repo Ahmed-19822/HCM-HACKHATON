@@ -33,8 +33,12 @@ const employeeSchema = new mongoose.Schema(
 );
 
 employeeSchema.virtual('fullName').get(function () {
-  return ${this.firstName} ;
+  return `${this.firstName} ${this.lastName}`;
 });
+
+employeeSchema.set('toJSON', { virtuals: true });
+employeeSchema.set('toObject', { virtuals: true });
+employeeSchema.index({ department: 1, status: 1 });
 
 const Employee = mongoose.model('Employee', employeeSchema);
 export default Employee;

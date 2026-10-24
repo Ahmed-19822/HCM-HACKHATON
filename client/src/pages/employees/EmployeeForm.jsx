@@ -59,7 +59,7 @@ export default function EmployeeForm() {
     mutationFn: (data) => isEdit ? updateEmployeeApi(id, data) : createEmployeeApi(data),
     onSuccess: () => {
       toast.success(`Employee ${isEdit ? "updated" : "created"} successfully`);
-      qc.invalidateQueries(["employees"]);
+      qc.invalidateQueries({ queryKey: ["employees"] });
       navigate("/employees");
     },
     onError: (err) => toast.error(err.response?.data?.message || "Something went wrong"),
@@ -75,7 +75,9 @@ export default function EmployeeForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const fd = new FormData();
-    Object.entries(form).forEach(([k, v]) => v && fd.append(k, v));
+    Object.entries(form).forEach(([k, v]) => {
+      if (v !== "" && v != null) fd.append(k, v);
+    });
     if (avatarFile) fd.append("avatar", avatarFile);
     mutation.mutate(fd);
   };

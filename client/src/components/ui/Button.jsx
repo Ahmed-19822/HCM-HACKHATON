@@ -16,14 +16,15 @@ const sizes = {
 
 export default function Button({
   children, variant = "primary", size = "md",
-  className = "", loading = false, icon, ...props
+  className = "", loading = false, icon, disabled, ...props
 }) {
   return (
     <motion.button
       whileTap={{ scale: 0.96 }}
       whileHover={{ scale: 1.02 }}
-      className={`inline-flex items-center gap-2 font-medium rounded-xl transition-all
-        duration-200 disabled:opacity-60 disabled:cursor-not-allowed
+      disabled={disabled || loading}
+      className={`inline-flex items-center justify-center gap-2 font-medium rounded-xl transition-all
+        duration-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100
         ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >

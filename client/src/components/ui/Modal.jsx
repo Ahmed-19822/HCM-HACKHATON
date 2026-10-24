@@ -1,7 +1,19 @@
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiX } from "react-icons/hi";
 
 export default function Modal({ open, onClose, title, children, size = "md" }) {
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (e) => { if (e.key === "Escape") onClose?.(); };
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open, onClose]);
   const widths = { sm:"max-w-md", md:"max-w-xl", lg:"max-w-2xl", xl:"max-w-4xl" };
   return (
     <AnimatePresence>

@@ -27,14 +27,23 @@ const leaveSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Calculate total days before save
-leaveSchema.pre('save', function (next) {
-  if (this.startDate && this.endDate) {
-    const diff = this.endDate - this.startDate;
-    this.totalDays = Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1;
+leaveSchema.pre('save', function () {
+  if (this.startDate && this.endDate && (this.isModified('startDate') || this.isModified('endDate') || this.totalDays == null)) {
+    let days = 0;
+    const cursor = new Date(this.startDate);
+    cursor.setHours(0, 0, 0, 0);
+    const last = new Date(this.endDate);
+    last.setHours(0, 0, 0, 0);
+    while (cursor <= last) {
+      const dow = cursor.getDay();
+      if (dow !== 0 && dow !== 6) days += 1;
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    this.totalDays = days;
   }
-  next();
 });
+
+leaveSchema.index({ employee: 1, status: 1, startDate: 1 });
 
 const Leave = mongoose.model('Leave', leaveSchema);
 export default Leave;

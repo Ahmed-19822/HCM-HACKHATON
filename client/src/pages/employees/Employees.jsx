@@ -37,7 +37,7 @@ export default function Employees() {
     mutationFn: (id) => deactivateEmployeeApi(id, { status: "terminated" }),
     onSuccess: () => {
       toast.success("Employee deactivated");
-      qc.invalidateQueries(["employees"]);
+      qc.invalidateQueries({ queryKey: ["employees"] });
       setConfirm(null);
     },
     onError: () => toast.error("Failed to deactivate"),
@@ -96,7 +96,7 @@ export default function Employees() {
               </tr>
             </thead>
             <tbody>
-              {isLoading ? <SkeletonTable rows={6}/> :
+              {isLoading ? <SkeletonTable rows={6} cols={6}/> :
                employees.length === 0 ? (
                 <tr><td colSpan={6}>
                   <EmptyState icon={<HiUsers/>} title="No employees found" description="Try adjusting your filters or add a new employee"/>
@@ -119,7 +119,7 @@ export default function Employees() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-slate-600">{emp.department?.name || "�"}</td>
+                    <td className="px-4 py-3 text-sm text-slate-600">{emp.department?.name || "—"}</td>
                   <td className="px-4 py-3 text-sm text-slate-600">{emp.designation}</td>
                   <td className="px-4 py-3 text-sm text-slate-500">{formatDate(emp.dateOfJoining)}</td>
                   <td className="px-4 py-3"><Badge status={emp.status}/></td>

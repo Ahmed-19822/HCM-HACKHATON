@@ -62,7 +62,10 @@ export const login = async (req, res, next) => {
 // @access Private
 export const getMe = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id).populate('employee');
+    const user = await User.findById(req.user._id).populate({
+      path: 'employee',
+      populate: { path: 'department', select: 'name' },
+    });
     res.json(new ApiResponse(200, 'Profile fetched', user));
   } catch (error) {
     next(error);
@@ -77,7 +80,7 @@ export const changePassword = async (req, res, next) => {
     const { currentPassword, newPassword } = req.body;
     const user = await User.findById(req.user._id).select('+password');
     if (!(await user.matchPassword(currentPassword))) {
-      throw new ApiError(401, 'Current password is incorrect');
+      throw new ApiError(400, 'Current password is incorrect');
     }
     user.password = newPassword;
     await user.save();

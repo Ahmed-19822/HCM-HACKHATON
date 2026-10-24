@@ -8,10 +8,10 @@ export function SkeletonCard() {
   );
 }
 
-export function SkeletonRow() {
+export function SkeletonRow({ cols = 6 }) {
   return (
     <tr className="animate-pulse">
-      {Array(5).fill(0).map((_, i) => (
+      {Array(cols).fill(0).map((_, i) => (
         <td key={i} className="px-4 py-3">
           <div className="h-4 bg-slate-200 rounded-lg"/>
         </td>
@@ -20,18 +20,12 @@ export function SkeletonRow() {
   );
 }
 
-export function SkeletonTable({ rows = 5 }) {
+export function SkeletonTable({ rows = 5, cols = 6 }) {
   return (
-    <div className="animate-pulse">
+    <>
       {Array(rows).fill(0).map((_, i) => (
-        <div key={i} className="flex gap-4 px-4 py-3 border-b border-slate-50">
-          <div className="h-4 bg-slate-200 rounded w-8"/>
-          <div className="h-4 bg-slate-200 rounded flex-1"/>
-          <div className="h-4 bg-slate-200 rounded w-24"/>
-          <div className="h-4 bg-slate-200 rounded w-20"/>
-          <div className="h-4 bg-slate-200 rounded w-16"/>
-        </div>
+        <SkeletonRow key={i} cols={cols} />
       ))}
-    </div>
+    </>
   );
 }

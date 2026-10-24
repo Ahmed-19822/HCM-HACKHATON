@@ -10,10 +10,15 @@ export const protect = async (req, res, next) => {
     }
     if (!token) throw new ApiError(401, 'Not authorized, no token');
 
+    if (!process.env.JWT_SECRET) {
+      throw new ApiError(500, 'Server JWT configuration is missing');
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = await User.findById(decoded.id).select('-password');
-    if (!req.user || !req.user.isActive)
+    if (!req.user || !req.user.isActive) {
       throw new ApiError(401, 'Not authorized, user not found or deactivated');
+    }
 
     next();
   } catch (error) {
@@ -24,7 +29,7 @@ export const protect = async (req, res, next) => {
 export const authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      return next(new ApiError(403, Role '' is not authorized));
+      return next(new ApiError(403, `Role '${req.user.role}' is not authorized`));
     }
     next();
   };

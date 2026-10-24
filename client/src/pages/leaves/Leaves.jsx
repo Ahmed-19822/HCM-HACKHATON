@@ -34,19 +34,19 @@ export default function Leaves() {
 
   const applyMutation = useMutation({
     mutationFn: applyLeaveApi,
-    onSuccess: () => { toast.success("Leave applied!"); qc.invalidateQueries(["leaves"]); setApplyModal(false); },
+    onSuccess: () => { toast.success("Leave applied!"); qc.invalidateQueries({ queryKey: ["leaves"] }); setApplyModal(false); },
     onError: (err) => toast.error(err.response?.data?.message || "Failed"),
   });
 
   const statusMutation = useMutation({
     mutationFn: ({ id, status, approverComment }) => updateLeaveStatusApi(id, { status, approverComment }),
-    onSuccess: () => { toast.success("Leave updated"); qc.invalidateQueries(["leaves"]); setRejectId(null); },
+    onSuccess: () => { toast.success("Leave updated"); qc.invalidateQueries({ queryKey: ["leaves"] }); setRejectId(null); },
     onError: () => toast.error("Failed to update"),
   });
 
   const cancelMutation = useMutation({
     mutationFn: cancelLeaveApi,
-    onSuccess: () => { toast.success("Leave cancelled"); qc.invalidateQueries(["leaves"]); setCancelId(null); },
+    onSuccess: () => { toast.success("Leave cancelled"); qc.invalidateQueries({ queryKey: ["leaves"] }); setCancelId(null); },
     onError: () => toast.error("Failed to cancel"),
   });
 
@@ -84,7 +84,7 @@ export default function Leaves() {
               </tr>
             </thead>
             <tbody>
-              {isLoading ? <SkeletonTable rows={5}/> :
+              {isLoading ? <SkeletonTable rows={5} cols={8}/> :
                leaves.length === 0 ? (
                 <tr><td colSpan={8}>
                   <EmptyState icon={<HiClipboardList/>} title="No leave records" description="No leaves found for the selected filter"/>

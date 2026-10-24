@@ -3,12 +3,13 @@ import {
   applyLeave, getLeaves, getLeave, updateLeaveStatus, cancelLeave,
 } from '../controllers/leave.controller.js';
 import { protect, authorize } from '../middleware/auth.middleware.js';
+import { validateLeave } from '../validator/leave.validator.js';
 
 const router = express.Router();
 
 router.route('/')
   .get(protect, getLeaves)
-  .post(protect, applyLeave);
+  .post(protect, validateLeave, applyLeave);
 
 router.route('/:id')
   .get(protect, getLeave)

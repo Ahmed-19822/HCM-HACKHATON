@@ -34,10 +34,19 @@ const resolveUploadDir = () => {
   return path.resolve(process.cwd(), 'uploads');
 };
 
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:3000')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const normalizeOrigins = (value) =>
+  String(value || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+const allowedOrigins = [
+  ...normalizeOrigins(process.env.CLIENT_URL),
+  ...normalizeOrigins(process.env.CLIENT_URLS),
+  ...normalizeOrigins(process.env.FRONTEND_URL),
+  ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
+  ...(process.env.VERCEL_PROJECT_PRODUCTION_URL ? [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`] : []),
+].filter(Boolean);
 
 const isLocalOrigin = (origin) => {
   try {
@@ -48,14 +57,32 @@ const isLocalOrigin = (origin) => {
   }
 };
 
+const isAllowedVercelOrigin = (origin) => {
+  try {
+    const { hostname, protocol } = new URL(origin);
+    if (protocol !== 'https:') return false;
+    return hostname.endsWith('.vercel.app') || hostname === 'vercel.app';
+  } catch {
+    return false;
+  }
+};
+
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*') || isLocalOrigin(origin)) {
+    if (
+      !origin ||
+      allowedOrigins.includes(origin) ||
+      allowedOrigins.includes('*') ||
+      isLocalOrigin(origin) ||
+      isAllowedVercelOrigin(origin)
+    ) {
       return callback(null, true);
     }
     return callback(new Error(`CORS blocked for origin: ${origin}`));
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));

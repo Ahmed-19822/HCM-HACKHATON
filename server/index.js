@@ -86,7 +86,8 @@ const isAllowedVercelOrigin = (origin) => {
 // }));
 app.use(cors({
   origin: [
-    "https://hcm-hackhaton-tu7l.vercel.app"
+    "https://hcm-hackhaton-tu7l.vercel.app",
+    "http://localhost:5173"
   ],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],

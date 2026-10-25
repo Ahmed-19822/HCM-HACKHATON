@@ -23,12 +23,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const resolveUploadDir = () => {
-  if (process.env.UPLOAD_DIR) {
-    return path.resolve(process.cwd(), process.env.UPLOAD_DIR);
-  }
-
   if (process.env.VERCEL) {
     return '/tmp/uploads';
+  }
+
+  if (process.env.UPLOAD_DIR) {
+    return path.resolve(process.cwd(), process.env.UPLOAD_DIR);
   }
 
   return path.resolve(process.cwd(), 'uploads');

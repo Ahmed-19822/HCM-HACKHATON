@@ -3,12 +3,12 @@ import path from 'path';
 import fs from 'fs';
 
 const resolveUploadDir = () => {
-  if (process.env.UPLOAD_DIR) {
-    return path.resolve(process.cwd(), process.env.UPLOAD_DIR);
-  }
-
   if (process.env.VERCEL) {
     return '/tmp/uploads';
+  }
+
+  if (process.env.UPLOAD_DIR) {
+    return path.resolve(process.cwd(), process.env.UPLOAD_DIR);
   }
 
   return path.resolve(process.cwd(), 'uploads');

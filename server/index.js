@@ -67,22 +67,30 @@ const isAllowedVercelOrigin = (origin) => {
   }
 };
 
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     if (
+//       !origin ||
+//       allowedOrigins.includes(origin) ||
+//       allowedOrigins.includes('*') ||
+//       isLocalOrigin(origin) ||
+//       isAllowedVercelOrigin(origin)
+//     ) {
+//       return callback(null, true);
+//     }
+//     return callback(new Error(`CORS blocked for origin: ${origin}`));
+//   },
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+// }));
 app.use(cors({
-  origin: (origin, callback) => {
-    if (
-      !origin ||
-      allowedOrigins.includes(origin) ||
-      allowedOrigins.includes('*') ||
-      isLocalOrigin(origin) ||
-      isAllowedVercelOrigin(origin)
-    ) {
-      return callback(null, true);
-    }
-    return callback(new Error(`CORS blocked for origin: ${origin}`));
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: [
+    "https://hcm-hackhaton-tu7l.vercel.app"
+  ],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
 }));
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
